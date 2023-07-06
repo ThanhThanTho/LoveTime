@@ -1,4 +1,4 @@
-package com.vn.thanhnx.countingtimetogether;
+package com.vn.thanhnx.countingtimetogether.Model;
 
 import java.util.Date;
 
