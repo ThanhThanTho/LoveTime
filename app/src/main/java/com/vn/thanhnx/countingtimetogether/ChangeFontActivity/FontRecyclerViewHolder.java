@@ -1,4 +1,4 @@
-package com.vn.thanhnx.countingtimetogether;
+package com.vn.thanhnx.countingtimetogether.ChangeFontActivity;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.vn.thanhnx.countingtimetogether.Model.Font;
+import com.vn.thanhnx.countingtimetogether.R;
 
 import java.util.ArrayList;
 

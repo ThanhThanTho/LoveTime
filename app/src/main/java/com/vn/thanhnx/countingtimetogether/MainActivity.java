@@ -5,19 +5,39 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.dhaval2404.imagepicker.ImagePicker;
+import com.vn.thanhnx.countingtimetogether.ChangeFontActivity.FontSelectActivity;
 import com.vn.thanhnx.countingtimetogether.Model.Font;
+import com.vn.thanhnx.countingtimetogether.Model.Relationship;
+import com.vn.thanhnx.countingtimetogether.Model.Theme;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,14 +56,25 @@ public class MainActivity extends AppCompatActivity {
     private TextView secondPersonName;
 
     private TextView textViewCounting;
+    private TextView relaName;
+    private MyDBHandler myDBHandler;
+    private TextView startDate;
+    private TextView textViewTime;
+    public static ArrayList<Font> fontList;
+    public static SharedPreferences sharedPreferences;
 
     private void bindingView(){
-        firstPic = findViewById(R.id.imageView);
-        secondPic = findViewById(R.id.imageView2);
+        firstPic = findViewById(R.id.firstPic);
+        secondPic = findViewById(R.id.secondPic);
         textViewCounting = findViewById(R.id.textViewTime);
         changeFont = findViewById(R.id.buttonChangeFont);
         firstPersonName = findViewById(R.id.firstPersonName);
         secondPersonName = findViewById(R.id.secondPersonName);
+        relaName = findViewById(R.id.relaName);
+        myDBHandler = new MyDBHandler(this);
+        startDate = findViewById(R.id.startDate);
+        textViewTime = findViewById(R.id.textViewTime);
+        sharedPreferences = getApplicationContext().getSharedPreferences("sharedPreferences", Context.MODE_PRIVATE);
     }
 
     private void bindingAction(){
@@ -52,14 +83,58 @@ public class MainActivity extends AppCompatActivity {
         changeFont.setOnClickListener(this::changeFont);
         firstPersonName.setOnClickListener(this::onFirstNameClick);
         secondPersonName.setOnClickListener(this::onSecondNameClick);
+        startDate.setOnClickListener(this::dateClick);
+        relaName.setOnClickListener(this::relaNameClick);
+    }
+
+    private void relaNameClick(View view) {
+        General.editTextView(relaName, MainActivity.this,
+                "RelationshipName", relaName.getText().toString(), myDBHandler);
+    }
+
+    private void dateClick(View view) {
+        // Create a Calendar instance to get the current date
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        // Create a DatePickerDialog and set the initial date
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                MainActivity.this,
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        // Create a Calendar instance and set the selected date
+                        Calendar selectedDate = Calendar.getInstance();
+                        selectedDate.set(year, month, dayOfMonth);
+
+                        // Create a SimpleDateFormat to format the date
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                        String formattedDate = dateFormat.format(selectedDate.getTime());
+
+                        // Update the TextView with the selected date
+                        startDate.setText(formattedDate);
+                        myDBHandler.updateRelationship(relaName.getText().toString(), "StartDate", formattedDate);
+                    }
+                },
+                year, month, day);
+
+        // Set the maximum date to today's date
+        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+
+        // Show the DatePickerDialog
+        datePickerDialog.show();
     }
 
     private void onSecondNameClick(View view) {
-        General.editTextView(secondPersonName, MainActivity.this);
+        General.editTextView(secondPersonName, MainActivity.this,
+                "SecondPersonName", relaName.getText().toString(), myDBHandler);
     }
 
     private void onFirstNameClick(View view) {
-        General.editTextView(firstPersonName, MainActivity.this);
+        General.editTextView(firstPersonName, MainActivity.this,
+                "FirstPersonName", relaName.getText().toString(), myDBHandler);
     }
 
     //move to change font activity
@@ -70,6 +145,45 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(i, REQUEST_CODE_OPEN_FONT_CHANGE);
     }
 
+    public void getFontData() {
+        fontList = new ArrayList<>();
+        fontList.add(new Font("AlexBrush-Regular", Typeface.createFromAsset(getAssets(),
+                "AlexBrush-Regular.ttf")));
+        fontList.add(new Font("Allura-Regular", Typeface.createFromAsset(getAssets(),
+                "Allura-Regular.ttf")));
+        fontList.add(new Font("Beaurivage-Regular", Typeface.createFromAsset(getAssets(),
+                "BeauRivage-Regular.ttf")));
+        fontList.add(new Font("BlackOpsOne-Regular", Typeface.createFromAsset(getAssets(),
+                "BlackOpsOne-Regular.ttf")));
+        fontList.add(new Font("BungeeShade-Regular", Typeface.createFromAsset(getAssets(),
+                "BungeeShade-Regular.ttf")));
+        fontList.add(new Font("ComforterBrush-Regular", Typeface.createFromAsset(getAssets(),
+                "ComforterBrush-Regular.ttf")));
+        fontList.add(new Font("DancingScript-VariableFont", Typeface.createFromAsset(getAssets(),
+                "DancingScript-VariableFont_wght.ttf")));
+        fontList.add(new Font("DenkOne-Regular", Typeface.createFromAsset(getAssets(),
+                "DenkOne-Regular.ttf")));
+        fontList.add(new Font("GreatVibes-Regular", Typeface.createFromAsset(getAssets(),
+                "GreatVibes-Regular.ttf")));
+        fontList.add(new Font("GrenzeGotisch_VariableFont", Typeface.createFromAsset(getAssets(),
+                "GrenzeGotisch-VariableFont_wght.ttf")));
+        fontList.add(new Font("Mansalva-Regular", Typeface.createFromAsset(getAssets(),
+                "Mansalva-Regular.ttf")));
+        fontList.add(new Font("MeowScript-Regular", Typeface.createFromAsset(getAssets(),
+                "MeowScript-Regular.ttf")));
+        fontList.add(new Font("Pacifico-Regular", Typeface.createFromAsset(getAssets(),
+                "Pacifico-Regular.ttf")));
+        fontList.add(new Font("QwitcherGrypen-Bold", Typeface.createFromAsset(getAssets(),
+                "QwitcherGrypen-Bold.ttf")));
+        fontList.add(new Font("Roboto-Regular", Typeface.createFromAsset(getAssets(),
+                "Roboto-Regular.ttf")));
+        fontList.add(new Font("Srisakdi-Bold", Typeface.createFromAsset(getAssets(),
+                "Srisakdi-Bold.ttf")));
+        fontList.add(new Font("Srisakdi-Regular", Typeface.createFromAsset(getAssets(),
+                "Srisakdi-Regular.ttf")));
+        fontList.add(new Font("VT323-Regular", Typeface.createFromAsset(getAssets(),
+                "VT323-Regular.ttf")));
+    }
 
     private void loadPersonImage(ImageView imageView){
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -85,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //open imagepicker to pick image for imageview
+    //open image picker to pick image for imageview
     private void openImagePicker(ImageView imageView) {
         if (imageView.equals(firstPic)){
             ImagePicker.with(this)
@@ -108,24 +222,37 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_CODE_PIC1 && resultCode == RESULT_OK) {
             Uri fullPhotoUri = data.getData();
             firstPic.setImageURI(fullPhotoUri);
+            myDBHandler.updateRelationship(relaName.getText().toString(), "FirstPic", fullPhotoUri.toString());
         }
         else if (requestCode == REQUEST_CODE_PIC2 && resultCode == RESULT_OK) {
             Uri fullPhotoUri = data.getData();
             secondPic.setImageURI(fullPhotoUri);
+            myDBHandler.updateRelationship(relaName.getText().toString(), "SecondPic", fullPhotoUri.toString());
         }
         else if(requestCode == REQUEST_CODE_OPEN_FONT_CHANGE && resultCode == 1){
+            //set font type for all related textview
             String nameFont = data.getStringExtra("fontFamily");
-            ArrayList<Font> fontArrayList = FontSelectActivity.getFontList();
-            for(int i = 0; i<fontArrayList.size(); i++){
-                if (fontArrayList.get(i).getFontName().equals(nameFont)){
-                    firstPersonName.setTypeface(fontArrayList.get(i).getFontType());
-                    secondPersonName.setTypeface(fontArrayList.get(i).getFontType());
-                    textViewCounting.setTypeface(fontArrayList.get(i).getFontType());
-                    break;
-                }
+            Typeface font = General.getFont(nameFont);
+            if (font != null){
+                setFontType(font);
             }
-
         }
+    }
+
+    private void setFontType(Typeface font){
+        firstPersonName.setTypeface(font);
+        secondPersonName.setTypeface(font);
+        textViewCounting.setTypeface(font);
+        relaName.setTypeface(font);
+        startDate.setTypeface(font);
+    }
+
+    private void setTextColor(String color){
+        firstPersonName.setTextColor(Color.parseColor(color));
+        secondPersonName.setTextColor(Color.parseColor(color));
+        textViewTime.setTextColor(Color.parseColor(color));
+        startDate.setTextColor(Color.parseColor(color));
+        relaName.setTextColor(Color.parseColor(color));
     }
 
     private void secondPicClick(View view) {
@@ -136,11 +263,71 @@ public class MainActivity extends AppCompatActivity {
         loadPersonImage(firstPic);
     }
 
+    private void loadCurrentRelationship(){
+        boolean keyExists = sharedPreferences.contains("currentRelationship");
+        if (!keyExists){
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("currentRelationship", "FirstLove");
+            editor.commit();
+        }
+        String currentRelationshipName = sharedPreferences.getString("currentRelationship", "");
+        Relationship currentRelationship = myDBHandler.getRelaByName(currentRelationshipName);
+        Theme currentTheme = myDBHandler.getThemeByID(currentRelationship.getThemeID());
+        Typeface currentFont = General.getFont(currentRelationship.getFontType());
+        relaName.setText(currentRelationship.getRelationshipName());//correct
+        startDate.setText(currentRelationship.getStartDate());//correct
+        firstPic.setImageURI(currentRelationship.getFirstPic());//correct
+        secondPic.setImageURI(currentRelationship.getSecondPic());//correct
+        firstPersonName.setText(currentRelationship.getFirstPersonName());//correct
+        secondPersonName.setText(currentRelationship.getSecondPersonName());//correct
+        setFontType(currentFont);//correct
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(currentTheme.getBackground());
+            Drawable drawable = Drawable.createFromStream(inputStream, currentTheme.getBackground().toString());
+            getWindow().setBackgroundDrawable(drawable);//correct
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        setTextColor(currentTheme.getTextColor());//correct
+    }
+
+    private void loadDefaultData(){
+        //add default theme
+        Uri backGround = General.convertDrawableToUri(this, R.drawable.lovebackground);
+        String textColor = "#000000";
+        myDBHandler.insertTheme(new Theme(backGround, textColor));
+        //add default relationship:
+        Relationship defaultRela = new Relationship();
+        defaultRela.setRelationshipName("FirstLove");
+        defaultRela.setThemeID(1);
+        defaultRela.setFirstPersonName("FirstPersonName");
+        Uri firstPicUri = General.convertDrawableToUri(this, R.drawable.male_avt);
+        defaultRela.setFirstPic(firstPicUri);
+        defaultRela.setSecondPersonName("SecondPersonName");
+        defaultRela.setSecondPic(General.convertDrawableToUri(this, R.drawable.female_avt));
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH) + 1; // Month is zero-based
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        defaultRela.setStartDate(day+"/"+month+"/"+year);
+        defaultRela.setFontType("Roboto-Regular");
+        myDBHandler.insertRelationship(defaultRela);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         bindingView();
         bindingAction();
+        getFontData();
+        if (myDBHandler.getRecordCount("Relationship")==0
+            && myDBHandler.getRecordCount("Theme")==0){
+            loadDefaultData();
+        }
+        loadCurrentRelationship();
     }
+
+
 }

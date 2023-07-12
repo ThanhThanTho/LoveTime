@@ -4,25 +4,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/lovebackground"
+
     tools:context=".MainActivity">
 
     <TextView
         android:id="@+id/secondPersonName"
         android:layout_width="134dp"
-        android:layout_height="60dp"
+        android:layout_height="100dp"
         android:gravity="center"
         android:text="Ngọc Ánh"
         android:textSize="20sp"
+        android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.877"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.921" />
+        app:layout_constraintVertical_bias="0.979" />
 
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/imageView"
+        android:id="@+id/firstPic"
         android:layout_width="134dp"
         android:layout_height="136dp"
         android:contentDescription="pic1"
@@ -39,7 +40,7 @@
         app:strokeWidth="5dp" />
 
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/secondPic"
         android:layout_width="134dp"
         android:layout_height="136dp"
         android:contentDescription="pic2"
@@ -57,13 +58,14 @@
 
     <TextView
         android:id="@+id/textViewTime"
-        android:layout_width="316dp"
+        android:layout_width="match_parent"
         android:layout_height="74dp"
         android:layout_marginStart="130dp"
         android:layout_marginEnd="94dp"
         android:gravity="center"
         android:text="365 ngày"
         android:textSize="24sp"
+        android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.643"
@@ -74,28 +76,60 @@
     <TextView
         android:id="@+id/firstPersonName"
         android:layout_width="134dp"
-        android:layout_height="60dp"
+        android:layout_height="100dp"
         android:gravity="center"
         android:text="Nguyễn Xuân Thành"
         android:textSize="20sp"
+        android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.129"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.921" />
+        app:layout_constraintVertical_bias="0.979" />
 
     <Button
         android:id="@+id/buttonChangeFont"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="290dp"
-        android:layout_marginTop="72dp"
         android:layout_marginEnd="33dp"
-        android:layout_marginBottom="37dp"
         android:text="Button"
-        app:layout_constraintBottom_toTopOf="@+id/textViewTime"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.159" />
+
+    <TextView
+        android:id="@+id/relaName"
+        android:layout_width="219dp"
+        android:layout_height="47dp"
+        android:gravity="center_vertical|end"
+        android:text="Tinh yeu"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.014"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.008" />
+
+    <TextView
+        android:id="@+id/startDate"
+        android:layout_width="118dp"
+        android:layout_height="47dp"
+        android:gravity="center"
+        android:text="14/04/2000"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.795"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.007" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
