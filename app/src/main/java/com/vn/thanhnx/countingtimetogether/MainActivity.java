@@ -1,8 +1,11 @@
 package com.vn.thanhnx.countingtimetogether;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
@@ -18,6 +21,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -68,8 +72,11 @@ public class MainActivity extends AppCompatActivity {
     public static ArrayList<Font> fontList;
     private Button memoryButton;
     public static SharedPreferences sharedPreferences;
-
+    public DrawerLayout drawerLayout;
+    public ActionBarDrawerToggle actionBarDrawerToggle;
     private void bindingView(){
+        drawerLayout = findViewById(R.id.my_drawer_layout);
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.nav_open, R.string.nav_close);
         firstPic = findViewById(R.id.firstPic);
         secondPic = findViewById(R.id.secondPic);
         textViewCounting = findViewById(R.id.textViewTime);
@@ -85,6 +92,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void bindingAction(){
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.syncState();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         firstPic.setOnClickListener(this::firstPicClick);
         secondPic.setOnClickListener(this::secondPicClick);
         changeFont.setOnClickListener(this::changeFont);
@@ -95,7 +105,13 @@ public class MainActivity extends AppCompatActivity {
         memoryButton.setOnClickListener(this::memoryClick);
     }
 
-
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (actionBarDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     private void memoryClick(View view) {
         Intent i = new Intent(this, MemoriesActivity.class);
