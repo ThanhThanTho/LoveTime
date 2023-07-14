@@ -27,23 +27,28 @@ import android.widget.Toast;
 
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.vn.thanhnx.countingtimetogether.ChangeFontActivity.FontSelectActivity;
+import com.vn.thanhnx.countingtimetogether.MemoryActivity.MemoriesActivity;
 import com.vn.thanhnx.countingtimetogether.Model.Font;
+import com.vn.thanhnx.countingtimetogether.Model.MemoryPic;
 import com.vn.thanhnx.countingtimetogether.Model.Relationship;
 import com.vn.thanhnx.countingtimetogether.Model.Theme;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE_PERMISSION = 1;
     private static final int REQUEST_CODE_PIC1 = 11;
     private static final int REQUEST_CODE_PIC2 = 12;
+    private static final int REQUEST_CODE_OPEN_MEMORIES = 13;
 
     private static final int REQUEST_CODE_OPEN_FONT_CHANGE = 10;
     private ImageView firstPic;
@@ -61,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView startDate;
     private TextView textViewTime;
     public static ArrayList<Font> fontList;
+    private Button memoryButton;
     public static SharedPreferences sharedPreferences;
 
     private void bindingView(){
@@ -74,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
         myDBHandler = new MyDBHandler(this);
         startDate = findViewById(R.id.startDate);
         textViewTime = findViewById(R.id.textViewTime);
+        memoryButton = findViewById(R.id.memoryButton);
         sharedPreferences = getApplicationContext().getSharedPreferences("sharedPreferences", Context.MODE_PRIVATE);
     }
 
@@ -85,6 +92,16 @@ public class MainActivity extends AppCompatActivity {
         secondPersonName.setOnClickListener(this::onSecondNameClick);
         startDate.setOnClickListener(this::dateClick);
         relaName.setOnClickListener(this::relaNameClick);
+        memoryButton.setOnClickListener(this::memoryClick);
+    }
+
+
+
+    private void memoryClick(View view) {
+        Intent i = new Intent(this, MemoriesActivity.class);
+        String previewString = firstPersonName.getText()+" & "+secondPersonName.getText();
+        i.putExtra("previewString", previewString);
+        startActivityForResult(i, REQUEST_CODE_OPEN_MEMORIES);
     }
 
     private void relaNameClick(View view) {
@@ -116,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
                         // Update the TextView with the selected date
                         startDate.setText(formattedDate);
                         myDBHandler.updateRelationship(relaName.getText().toString(), "StartDate", formattedDate);
+                        textViewTime.setText(countingLoveTime(formattedDate));
                     }
                 },
                 year, month, day);
@@ -232,6 +250,7 @@ public class MainActivity extends AppCompatActivity {
         else if(requestCode == REQUEST_CODE_OPEN_FONT_CHANGE && resultCode == 1){
             //set font type for all related textview
             String nameFont = data.getStringExtra("fontFamily");
+            myDBHandler.updateRelationship(relaName.getText().toString(), "FontType", nameFont);
             Typeface font = General.getFont(nameFont);
             if (font != null){
                 setFontType(font);
@@ -289,6 +308,25 @@ public class MainActivity extends AppCompatActivity {
             throw new RuntimeException(e);
         }
         setTextColor(currentTheme.getTextColor());//correct
+        textViewTime.setText(countingLoveTime(currentRelationship.getStartDate()));
+    }
+
+    private String countingLoveTime(String dateString){
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            Date givenDate = dateFormat.parse(dateString);
+
+            Date currentTime = Calendar.getInstance().getTime();
+
+            long timeDifference = currentTime.getTime() - givenDate.getTime();
+            long days = TimeUnit.MILLISECONDS.toDays(timeDifference);
+
+            return days + " ngày";
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return "";
     }
 
     private void loadDefaultData(){

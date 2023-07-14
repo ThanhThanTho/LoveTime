@@ -15,6 +15,9 @@
         android:theme="@style/Theme.CountingTimeTogether"
         tools:targetApi="31">
         <activity
+            android:name=".MemoryActivity.MemoriesActivity"
+            android:exported="false" />
+        <activity
             android:name=".ChangeFontActivity.FontSelectActivity"
             android:exported="false" />
         <activity

@@ -11,10 +11,12 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.vn.thanhnx.countingtimetogether.Model.MemoryPic;
 import com.vn.thanhnx.countingtimetogether.Model.Relationship;
 import com.vn.thanhnx.countingtimetogether.Model.Theme;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -36,6 +38,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
     public static final String Column_PictureID = "PictureID";
     //public static final String Column_RelationShipID = "RelationShipID"; foreign key
     public static final String Column_Picture = "Picture";
+    public static final String Column_Status = "Status";
 
     //table Theme and it's column
     public static final String Table_Theme = "Theme";
@@ -70,6 +73,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
                         Column_PictureID + " INTEGER PRIMARY KEY AUTOINCREMENT, \n" +
                         Column_RelationshipID + " INTEGER NOT NULL, \n" +
                         Column_Picture + " TEXT NOT NULL, \n" +
+                        Column_Status + " TEXT, \n"+
                         "FOREIGN KEY("+Column_RelationshipID+") REFERENCES " +Table_Relationship+"("+Column_RelationshipID+")\n"+
                         ")";
         String createTableTheme =
@@ -81,26 +85,6 @@ public class MyDBHandler extends SQLiteOpenHelper {
         db.execSQL(createTableTheme);
         db.execSQL(createTableRelationship);
         db.execSQL(createTableMemoryPicture);
-//        //add default theme
-//        Uri backGround = General.convertDrawableToUri(context, R.drawable.lovebackground);
-//        String textColor = "#000000";
-//        insertTheme(new Theme(backGround, textColor));
-//        //add default relationship:
-//        Relationship defaultRela = new Relationship();
-//        defaultRela.setRelationshipName("FirstLove");
-//        defaultRela.setThemeID(1);
-//        defaultRela.setFirstPersonName("FirstPersonName");
-//        defaultRela.setFirstPic(General.convertDrawableToUri(context, R.drawable.male_avt));
-//        defaultRela.setSecondPersonName("SecondPersonName");
-//        defaultRela.setSecondPic(General.convertDrawableToUri(context, R.drawable.female_avt));
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.setTime(new Date());
-//        int year = calendar.get(Calendar.YEAR);
-//        int month = calendar.get(Calendar.MONTH) + 1; // Month is zero-based
-//        int day = calendar.get(Calendar.DAY_OF_MONTH);
-//        defaultRela.setStartDate(day+"/"+month+"/"+year);
-//        defaultRela.setFontType("Roboto-Regular");
-//        insertRelationship(defaultRela);
     }
 
     @Override
@@ -134,7 +118,6 @@ public class MyDBHandler extends SQLiteOpenHelper {
     }
 
     public Relationship getRelaByName(String relaName){
-        //String command = "SELECT * FROM "+Table_Relationship+" WHERE "+Column_RelationshipName+" = ?";
         String command = "SELECT * FROM " + Table_Relationship + " WHERE " + Column_RelationshipName + " = ?";
         String[] selectionArgs = {String.valueOf(relaName)};
         Cursor cursor = this.getReadableDatabase().rawQuery(command, selectionArgs);
@@ -195,5 +178,20 @@ public class MyDBHandler extends SQLiteOpenHelper {
                 " WHERE "+Column_RelationshipName+" = '"+relaName+"'";
         db.execSQL(command);
         db.close();
+    }
+
+    public ArrayList<MemoryPic> getAllMemoryByRela(int relaID){
+        ArrayList<MemoryPic> memoryPics = new ArrayList<>();
+        String command = "SELECT * FROM "+Table_MemoryPicture+"\n"+
+                         "WHERE "+Column_RelationshipID+" = ?";
+        String[] selectionArgs = {String.valueOf(relaID)};
+        Cursor cursor = this.getReadableDatabase().rawQuery(command, selectionArgs);
+        while (cursor.moveToFirst()) {
+            int PictureID = cursor.getInt(0);
+            String Picture = cursor.getString(2);
+            String Status = cursor.getString(3);
+            memoryPics.add(new MemoryPic(PictureID, Uri.parse(Picture), Status));
+        }
+        return memoryPics;
     }
 }
