@@ -1,10 +1,12 @@
 package com.vn.thanhnx.countingtimetogether;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.Manifest;
@@ -30,6 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.dhaval2404.imagepicker.ImagePicker;
+import com.google.android.material.navigation.NavigationView;
 import com.vn.thanhnx.countingtimetogether.ChangeFontActivity.FontSelectActivity;
 import com.vn.thanhnx.countingtimetogether.MemoryActivity.MemoriesActivity;
 import com.vn.thanhnx.countingtimetogether.Model.Font;
@@ -74,7 +77,9 @@ public class MainActivity extends AppCompatActivity {
     public static SharedPreferences sharedPreferences;
     public DrawerLayout drawerLayout;
     public ActionBarDrawerToggle actionBarDrawerToggle;
+    private NavigationView navigationView;
     private void bindingView(){
+        navigationView = findViewById(R.id.nav_view);
         drawerLayout = findViewById(R.id.my_drawer_layout);
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.nav_open, R.string.nav_close);
         firstPic = findViewById(R.id.firstPic);
@@ -92,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void bindingAction(){
+        navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -104,6 +110,26 @@ public class MainActivity extends AppCompatActivity {
         relaName.setOnClickListener(this::relaNameClick);
         memoryButton.setOnClickListener(this::memoryClick);
     }
+
+    private boolean onNavigationItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(item.getItemId() == R.id.nav_font) {
+            Toast.makeText(this,"font",Toast.LENGTH_SHORT).show();
+        }
+        else if(item.getItemId() == R.id.nav_logout){
+            Toast.makeText(this,"logout",Toast.LENGTH_SHORT).show();
+        }
+        else if(item.getItemId() == R.id.nav_settings){
+            Toast.makeText(this,"settings",Toast.LENGTH_SHORT).show();
+        }
+        DrawerLayout drawer = findViewById(R.id.my_drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+
+
+
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
